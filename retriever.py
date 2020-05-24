@@ -12,8 +12,11 @@ def main():
     for RES in RESOURCES:
         try:
             res = requests.get(RES['url'])
+            # hack, because some sites return 200 even when the resource is not found
+            if res.headers['Content-Type'] != RES['mine']:
+                raise RequestException
         except RequestException:
-            logging.error(f"Error while reaching out to {RES['ref']}")
+            logging.error(f"Request to {RES['ref']} failed. Failing url: {RES['url']}")
             continue
 
         binary_content = res.content
@@ -39,6 +42,6 @@ if __name__ == "__main__":
         datefmt='%Y-%m-%dT%H:%M:%S',  # iso8601 format
         level=logging.INFO,
     )
-    logging.info('Start')
+    logging.info('Started')
     main()
-    logging.info('End')
+    logging.info('Ended successfully')

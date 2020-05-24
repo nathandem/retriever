@@ -7,18 +7,18 @@ API_SECRET = os.environ['RETRIEVER_MJ_API_SECRET']
 mailjet = Client(auth=(API_KEY, API_SECRET), version='v3.1')
 
 def send_paper(name: str, ref: str, url: str):
-    receiver_email = 'nathan.demaestri@gmail.com'
+    receiver_email = os.environ['RETRIEVER_RECEIVER_EMAIL']
     data = {
         'Messages': [
             {
                 "From": {
-                    "Email": "retriever@nathandem.com",
+                    "Email": os.environ['RETRIEVER_SENDER_EMAIL'],
                     "Name": "Retriever"
                 },
                 "To": [
                     {
                         "Email": receiver_email,
-                        "Name": "Nathan"
+                        "Name": os.environ['RETRIEVER_RECEIVER_NAME']
                     }
                 ],
                 "Subject": f"New issue of {ref} available!",

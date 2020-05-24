@@ -7,6 +7,7 @@ API_KEY = os.environ['RETRIEVER_MJ_API_KEY']
 API_SECRET = os.environ['RETRIEVER_MJ_API_SECRET']
 mailjet = Client(auth=(API_KEY, API_SECRET), version='v3.1')
 
+
 def email_alert(name: str, ref: str, url: str):
     receiver_email = os.environ['RETRIEVER_RECEIVER_EMAIL']
     data = {

@@ -5,11 +5,11 @@ from mailjet_rest import Client
 
 API_KEY = os.environ['RETRIEVER_MJ_API_KEY']
 API_SECRET = os.environ['RETRIEVER_MJ_API_SECRET']
+RECEIVER_EMAIL = os.environ['RETRIEVER_RECEIVER_EMAIL']
 mailjet = Client(auth=(API_KEY, API_SECRET), version='v3.1')
 
 
-def email_alert(name: str, ref: str, url: str):
-    receiver_email = os.environ['RETRIEVER_RECEIVER_EMAIL']
+def send_email(subject: str, message: str):
     data = {
         'Messages': [
             {
@@ -19,13 +19,13 @@ def email_alert(name: str, ref: str, url: str):
                 },
                 "To": [
                     {
-                        "Email": receiver_email,
+                        "Email": RECEIVER_EMAIL,
                         "Name": os.environ['RETRIEVER_RECEIVER_NAME']
                     }
                 ],
-                "Subject": f"New issue of {ref} available!",
-                "TextPart": f"New issue of {name} available at {url}",
-                "HTMLPart": f"New issue of {name} available at {url}",
+                "Subject": subject,
+                "TextPart": message,
+                "HTMLPart": message,
             }
         ]
     }
@@ -36,4 +36,16 @@ def email_alert(name: str, ref: str, url: str):
         logging.error(f"An error occurred while sending the email! - status: {result.status_code}. Full res: {result}")
         raise Exception  # let the script crash
 
-    logging.info(f"Email for {ref} sent to {receiver_email}")
+
+def email_alert(ref: str, name: str, url: str):
+    subject = f"New issue of {name} available!"
+    message = f"New issue of {name} available!\nLink: {url}"
+    send_email(subject, message)
+    logging.info(f"Email for new issue of {ref} sent to {RECEIVER_EMAIL}")
+
+
+def email_error(ref: str, url: str):
+    subject = f"Issue to {ref} failed!"
+    message = f"Request to {ref} failed.\nFailing url: {url}"
+    send_email(subject, message)
+    logging.info(f"Email for request failure sent to {RECEIVER_EMAIL}")

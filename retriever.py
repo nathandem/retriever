@@ -4,7 +4,7 @@ import requests
 from requests.exceptions import RequestException
 
 from RESOURCES import RESOURCES
-from utils.emailing import email_alert
+from utils.emailing import email_alert, email_error
 from utils.checksum import get_checksum, create_checksum
 
 
@@ -17,6 +17,8 @@ def main():
                 raise RequestException
         except RequestException:
             logging.error(f"Request to {RES['ref']} failed. Failing url: {RES['url']}")
+            # opti: configure the logger to send emails on errors (https://dev.mailjet.com/email/guides/send-api-v31/)
+            email_error(ref=RES['ref'], url=RES['url'])
             continue
 
         binary_content = res.content
@@ -27,11 +29,11 @@ def main():
             recorded_checksum = get_checksum(RES['ref'])
         except FileNotFoundError:
             create_checksum(ref=RES['ref'], checksum=new_checksum)
-            email_alert(**RES)
+            email_alert(ref=RES['ref'], name=RES['name'], url=RES['url'])
         else:
             if new_checksum != recorded_checksum:
                 create_checksum(ref=RES['ref'], checksum=new_checksum)
-                email_alert(**RES)
+                email_alert(ref=RES['ref'], name=RES['name'], url=RES['url'])
                 continue
             logging.info(f"Today's checksum match recorded one for {RES['ref']}")
 

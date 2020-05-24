@@ -1,3 +1,4 @@
+import logging
 import os
 from mailjet_rest import Client
 
@@ -31,7 +32,7 @@ def email_alert(name: str, ref: str, url: str):
     result = mailjet.send.create(data=data)
 
     if result.status_code != 200:
-        print("An error occurred while sending the email!")
+        logging.error(f"An error occurred while sending the email! - status: {result.status_code}")
         # note: no exception raised to avoid making `retriever` flow harder to read with too many try/except blocks
 
-    print(f"Email for {ref} sent to {receiver_email}")
+    logging.info(f"Email for {ref} sent to {receiver_email}")

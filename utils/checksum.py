@@ -1,3 +1,4 @@
+import logging
 import os
 
 
@@ -10,4 +11,4 @@ def get_checksum(ref: str) -> str:
 def create_checksum(ref: str, checksum: str):
     with open(f'{CHECKSUM_DIR_PATH}{ref}', 'w') as f:
         f.write(checksum)
-        print(f"Created new checksum file for {ref}")
+        logging.debug(f"Created new checksum file for {ref}")

@@ -1,11 +1,11 @@
 import hashlib
 import requests
 from requests.exceptions import RequestException
-from utils.emailing import send_paper
+from utils.emailing import email_alert
 from utils.checksum import get_checksum, create_checksum
 
 
-PAPERS = [
+RESOURCES = [
     {
         'ref': 'NBC_MONTHLY_ECONOMIC',
         'name': 'National bank monthly economic monitor',
@@ -29,11 +29,11 @@ PAPERS = [
 ]
 
 
-for PAPER in PAPERS:
+for RES in RESOURCES:
     try:
-        res = requests.get(PAPER['url'])
+        res = requests.get(RES['url'])
     except RequestException:
-        print(f"Error while reaching out to {PAPER['ref']}")
+        print(f"Error while reaching out to {RES['ref']}")
         continue
 
     binary_content = res.content
@@ -41,13 +41,13 @@ for PAPER in PAPERS:
 
     recorded_checksum = None
     try:
-        recorded_checksum = get_checksum(PAPER['ref'])
+        recorded_checksum = get_checksum(RES['ref'])
     except FileNotFoundError:
-        create_checksum(ref=PAPER['ref'], checksum=new_checksum)
-        send_paper(**PAPER)
+        create_checksum(ref=RES['ref'], checksum=new_checksum)
+        email_alert(**RES)
     else:
         if new_checksum != recorded_checksum:
-            create_checksum(ref=PAPER['ref'], checksum=new_checksum)
-            send_paper(**PAPER)
+            create_checksum(ref=RES['ref'], checksum=new_checksum)
+            email_alert(**RES)
             continue
-        print(f"Today's checksum match recorded one for {PAPER['ref']}")
+        print(f"Today's checksum match recorded one for {RES['ref']}")
